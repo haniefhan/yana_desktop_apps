@@ -80,8 +80,12 @@ class Moonruneworks():
 
     addStyleSheet = """
     <style>
-        body{font-family: Arial; font-size: 11pt;}
-        p{margin: 10px 20px; line-height: 25px;}
+        body{
+            font-family: Arial;
+            font-size: 11pt;
+            padding: 20px;
+            line-height: 25px;
+        }
     </style>"""
 
     @classmethod

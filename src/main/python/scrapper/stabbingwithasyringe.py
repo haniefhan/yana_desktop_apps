@@ -142,9 +142,13 @@ class Stabbingwithasyringe():
 
     addStyleSheet = """
     <style>
-        body{font-family: Arial; font-size: 11pt;}
-        h3{font-size: 1.5625rem; margin: 20px;}
-        p{margin: 10px 20px; line-height: 25px;}
+        body{
+            font-family: Arial;
+            font-size: 11pt;
+            padding: 20px;
+            line-height: 25px;
+        }
+        h3{font-size: 1.5625rem;}
     </style>"""
 
     @classmethod
@@ -154,7 +158,7 @@ class Stabbingwithasyringe():
             <head>
             """ + self.addStyleSheet + """
             </head>
-            <body style="padding: 50px;">
+            <body>
             """ + body + """
             </body>
         </html>
