@@ -1,7 +1,8 @@
 from fbs_runtime.application_context.PyQt5 import ApplicationContext
 from PyQt5.QtWidgets import (
     QMainWindow, QLabel, QPushButton, QMessageBox, QComboBox,
-    QListWidget, QListWidgetItem, QTextEdit, QProgressBar
+    QListWidget, QListWidgetItem, QTextEdit, QProgressBar,
+    QLineEdit
 )
 # from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 from PyQt5.QtGui import (
@@ -180,11 +181,24 @@ class Yana(QMainWindow):
 
     # START: USER INTERFACE
     # LEFT MENU
+    def filterNovelList(self):
+        text = self.searchBox.text()
+
+        filtered = []
+        for te in self.novelList.findItems(text, Qt.MatchContains):
+            filtered.append(te.text())
+
+        lst = self.novelList
+        for i in range(lst.count()):
+            if lst.item(i).text() not in filtered:
+                lst.item(i).setHidden(True)
+            else:
+                lst.item(i).setHidden(False)
+
     def leftMenuUI(self):
         src_list = YanaDB.getSourceList()
 
         self.sourceList = QComboBox(self)
-        # self.sourceList.addItems(src_list)
 
         self.sourceModel = QStandardItemModel()
         for src in src_list:
@@ -209,9 +223,16 @@ class Yana(QMainWindow):
         self.labelnovel.adjustSize()
         self.labelnovel.move(10, 58)
 
+        self.searchBox = QLineEdit(self)
+        self.searchBox.setPlaceholderText("Search Novel here...")
+        self.searchBox.move(10, 75)
+        self.searchBox.resize(200, 20)
+        self.searchBox.setStyleSheet("border: 1px solid #999;")
+        self.searchBox.textChanged.connect(self.filterNovelList)
+
         self.novelList = QListWidget(self)
-        self.novelList.move(10, 75)
-        self.novelList.resize(200, self.height() - 115)
+        self.novelList.move(10, 100)
+        self.novelList.resize(200, self.height() - 140)
         self.novelList.itemDoubleClicked.connect(self.showNovelInfo)
 
         self.updateNovelList()
