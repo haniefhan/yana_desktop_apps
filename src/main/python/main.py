@@ -1,19 +1,21 @@
 from fbs_runtime.application_context.PyQt5 import ApplicationContext
 from PyQt5.QtWidgets import (
     QMainWindow, QLabel, QPushButton, QMessageBox, QComboBox,
-    QListWidget, QListWidgetItem, QTextEdit, QTextBrowser,
-    QProgressBar
+    QListWidget, QListWidgetItem, QTextEdit, QProgressBar
 )
 # from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 from PyQt5.QtGui import (
-    QPixmap, QImage, QStandardItemModel, QStandardItem, QTextCursor
+    QPixmap, QImage, QStandardItemModel, QStandardItem, QTextCursor,
+    QTextDocument
 )
 
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal, Qt
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 import sys
 import requests
 import math
+
 sys.path.append(".")
 from yanadb import YanaDB
 from scrapper.stabbingwithasyringe import Stabbingwithasyringe
@@ -50,10 +52,12 @@ class YanaRead(QMainWindow):
         self.chapterList.resize(200, self.height() - 40)
         self.chapterList.itemDoubleClicked.connect(self.setContent)
 
-        self.textArea = QTextBrowser(self)
+        self.textArea = QWebEngineView(self)
         self.textArea.move(220, 30)
         self.textArea.resize(self.width() - 225, self.height() - 40)
+        self.textArea.setAttribute(Qt.WA_StyledBackground)
         self.textArea.setStyleSheet("border: 1px solid #999;")
+        self.textArea.setContentsMargins(1, 1, 1, 1)
 
     def read(self, src_id, chp_id):
         src = self.yana.yanadb.getSource(src_id)
@@ -82,6 +86,7 @@ class YanaRead(QMainWindow):
             if chp['volume_name'] != groupName:
                 # self.chapterList.addItem(chp['volume_name'])
                 item = QListWidgetItem(chp['volume_name'])
+                item.setData(3, chp['volume_name'])
                 item.setData(33, 'chapter_header')
                 font = item.font()
                 font.setBold(True)
@@ -90,6 +95,7 @@ class YanaRead(QMainWindow):
                 groupName = chp['volume_name']
             # self.chapterList.addItem(" - " + chp['chp_title'])
             item = QListWidgetItem(" - " + chp['chp_title'])
+            item.setData(3, chp['chp_title'])
             item.setData(33, 'chapter')
             item.setData(34, chp['chp_id'])
             item.setData(35, chp['src_id'])
@@ -221,7 +227,7 @@ class Yana(QMainWindow):
         self.bookCover.move(230, 75)
         self.bookCover.setPixmap(book_cover)
         self.bookCover.resize(self.cover_width, self.cover_height)
-        self.bookCover.setStyleSheet("border: 1px solid #333;")
+        self.bookCover.setStyleSheet("border: 1px solid #999;")
 
         x = 371
         y = 75
@@ -497,7 +503,7 @@ class Yana(QMainWindow):
 def window():
     appctxt = ApplicationContext()
     # appctxt.get_resource("../resources/yana.db")
-
+    appctxt.app.setStyle("windowsvista")  # windowsvista, Windows, Fusion
     window = Yana()
 
     window.show()
