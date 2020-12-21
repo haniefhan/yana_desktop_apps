@@ -2,7 +2,8 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 
 import sys
-import os
+from os import listdir, getcwd
+from os.path import isfile, join
 import natsort
 from operator import itemgetter
 from datetime import datetime
@@ -154,132 +155,34 @@ class BaseDB():
 
 
 class YanaDB(BaseDB):
+    _migration_path = getcwd() + "/src/main/python/migrations/"
     def __init__(self):
         super().__init__('yana.db')
         # self.checkConnection()
 
     def startUpInitialization(self):
-        self.tableSource()
-        self.tableNovel()
-        self.tableNovelSource()
-        self.tableVolume()
-        self.tableChapter()
+        self.migrate()
 
         self.insertSourceQuery()
         print(self.db.tables())
 
-    def tableSource(self):
-        query = """
-        CREATE TABLE IF NOT EXISTS source(
-            src_id integer PRIMARY KEY,
-            src_name varchar(255) NULL,
-            src_scrapper_name varchar(255) NULL,
-            src_base_url varchar(255) NULL
-        );
-        """
+    def migrate(self):
+        files = [
+            f for f in listdir(self._migration_path) if isfile(join(self._migration_path, f))
+        ]
+
         do = QSqlQuery()
-        do.prepare(query)
-        do.exec()
 
-    def tableNovel(self):
-        query = """
-        CREATE TABLE IF NOT EXISTS novel(
-            nv_id integer PRIMARY KEY,
-            nv_title varchar(255) NULL,
-            nv_title_original varchar(255) NULL,
-            nv_author varchar(255) NULL,
-            nv_artist varchar(255) NULL,
-            nv_url varchar(255) NULL,
-            nv_url_original varchar(255) NULL,
-            nv_desc text NULL,
-            nv_image_url varchar(255) NULL,
-            nv_image_url_original varchar(255) NULL,
-            nv_total_chapter varchar(255) NULL,
-            nv_last_chapter varchar(255) NULL,
-            nv_last_update datetime NULL,
-            nv_last_check datetime NULL
-        );
-        """
+        for file in files:
+            fd = open(self._migration_path + file, "r")
+            query = fd.read()
+            fd.close()
+            do.prepare(query)
+            do.exec()
+
+
         do = QSqlQuery()
-        do.prepare(query)
-        do.exec()
 
-    def tableNovelSource(self):
-        query = """
-        CREATE TABLE IF NOT EXISTS novel_source(
-            nv_src_id integer PRIMARY KEY,
-            nv_id integer,
-            src_id integer,
-            FOREIGN KEY (nv_id) REFERENCES novel (nv_id),
-            FOREIGN KEY (src_id) REFERENCES source (src_id)
-        );
-        """
-        do = QSqlQuery()
-        do.prepare(query)
-        do.exec()
-
-    def tableVolume(self):
-        query = """
-        CREATE TABLE IF NOT EXISTS volume(
-            volume_id integer PRIMARY KEY,
-            volume_name varchar(255) NULL,
-            nv_id integer NOT NULL,
-            FOREIGN KEY (nv_id) REFERENCES novel (nv_id)
-        );
-        """
-        do = QSqlQuery()
-        do.prepare(query)
-        do.exec()
-
-    def tableChapter(self):
-        query = """
-        CREATE TABLE IF NOT EXISTS chapter(
-            chp_id integer PRIMARY KEY,
-            chp_title varchar(255) NULL,
-            chp_no varchar(255) NULL,
-            chp_url varchar(255) NULL,
-            chp_date datetime NULL,
-            -- chp_volume varchar(255) NULL,
-            src_id integer NOT NULL,
-            nv_id integer NOT NULL,
-            volume_id integer NULL,
-            FOREIGN KEY (src_id) REFERENCES source (src_id),
-            FOREIGN KEY (nv_id) REFERENCES novel (nv_id),
-            FOREIGN KEY (volume_id) REFERENCES volume (volume_id)
-        );
-        """
-        do = QSqlQuery()
-        do.prepare(query)
-        do.exec()
-
-    # def insertSourceQuery(self):
-    #     listdir = os.listdir("src/main/python/scrapper")
-    #     for li in listdir:
-    #         if ".py" in li:
-    #             import scrapper.stabbingwithasyringe
-
-    _sourceList = [
-        {
-            'src_name': 'Stabbing With Syringe',
-            'src_scrapper_name': 'Stabbingwithasyringe',
-            'src_base_url': 'https://stabbingwithasyringe.home.blog/'
-        },
-        {
-            'src_name': 'Moonruneworks',
-            'src_scrapper_name': 'Moonruneworks',
-            'src_base_url': 'https://moonruneworks.com/'
-        },
-        {
-            'src_name': 'Ero Light Novel Translations',
-            'src_scrapper_name': 'Erolns',
-            'src_base_url': 'http://erolns.blogspot.com/'
-        },
-        {
-            'src_name': 'Shin Translations',
-            'src_scrapper_name': 'Shintranslations',
-            'src_base_url': 'https://shintranslations.com/'
-        },
-    ]
 
     def insertSourceQuery(self):
         do = QSqlQuery()
