@@ -7,8 +7,7 @@ from os.path import isfile, join
 import natsort
 from operator import itemgetter
 from datetime import datetime
-
-# sys.path.append(".")
+import json
 
 
 class BaseDB():
@@ -156,6 +155,8 @@ class BaseDB():
 
 class YanaDB(BaseDB):
     _migration_path = getcwd() + "/src/main/python/migrations/"
+    _source_path = getcwd() + "/src/main/python/source/"
+
     def __init__(self):
         super().__init__('yana.db')
         # self.checkConnection()
@@ -163,7 +164,7 @@ class YanaDB(BaseDB):
     def startUpInitialization(self):
         self.migrate()
 
-        self.insertSourceQuery()
+        self.insertSource()
         print(self.db.tables())
 
     def migrate(self):
@@ -180,23 +181,25 @@ class YanaDB(BaseDB):
             do.prepare(query)
             do.exec()
 
+    def insertSource(self):
+        files = [
+            f for f in listdir(self._source_path) if isfile(join(self._source_path, f))
+        ]
 
         do = QSqlQuery()
 
+        for file in files:
+            fd = open(self._source_path + file, "r")
+            js_string = fd.read()
+            fd.close()
+            source = json.loads(js_string)
 
-    def insertSourceQuery(self):
-        do = QSqlQuery()
-        for source in self._sourceList:
             if not self.checkIfDataExist(
                 "source", {"src_scrapper_name": source['src_scrapper_name']}
             ):
                 self.insert(
                     "source",
-                    {
-                        "src_name": source['src_name'],
-                        "src_scrapper_name": source['src_scrapper_name'],
-                        "src_base_url": source['src_base_url'],
-                    }
+                    source
                 )
 
     # SOURCE
