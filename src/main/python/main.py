@@ -26,18 +26,27 @@ YanaDB = YanaDB()
 mods = []
 sources = YanaDB.getAll("source", {"src_name": "ASC"})
 for src in sources:
-    exec(
-        "from scrapper."
-        + src['src_scrapper_name'].lower()
-        + " import "
-        + src['src_scrapper_name'])
+    try:
+        exec(
+            "from scrapper."
+            + src['src_scrapper_name'].lower()
+            + " import "
+            + src['src_scrapper_name'])
+    except ModuleNotFoundError:
+        pass
     # ex :
     # from shintranslations import Shintranslations
 
 
 def NovelSwitcher(src_name):
-    item = next(item for item in sources if item["src_name"] == src_name)
-    return eval(item['src_scrapper_name'])
+    try:
+        item = next(item for item in sources if item["src_name"] == src_name)
+        try:
+            return eval(item['src_scrapper_name'])
+        except NameError:
+            return None
+    except StopIteration:
+        return None
 
     # top same as below
     # if src_name == "Stabbing With Syringe":
