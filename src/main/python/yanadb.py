@@ -274,6 +274,11 @@ class YanaDB(BaseDB):
             'src_scrapper_name': 'Erolns',
             'src_base_url': 'http://erolns.blogspot.com/'
         },
+        {
+            'src_name': 'Shin Translations',
+            'src_scrapper_name': 'Shintranslations',
+            'src_base_url': 'https://shintranslations.com/'
+        },
     ]
 
     def insertSourceQuery(self):

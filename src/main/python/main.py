@@ -22,6 +22,7 @@ from yanadb import YanaDB
 from scrapper.stabbingwithasyringe import Stabbingwithasyringe
 from scrapper.moonruneworks import Moonruneworks
 from scrapper.erolns import Erolns
+from scrapper.shintranslations import Shintranslations
 
 
 def NovelSwitcher(src_name):
@@ -31,6 +32,8 @@ def NovelSwitcher(src_name):
         return Moonruneworks()
     elif src_name == "Ero Light Novel Translations":
         return Erolns()
+    elif src_name == "Shin Translations":
+        return Shintranslations()
     else:
         return None
 
