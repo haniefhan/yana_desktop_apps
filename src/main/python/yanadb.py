@@ -299,7 +299,16 @@ class YanaDB(BaseDB):
     # SOURCE
     @classmethod
     def getSourceList(self):
-        return self.getAll("source", {"src_name": "ASC"})
+        ret = []
+        ret.append({
+            "src_id": "0",
+            "src_name": "All Web Source",
+            "src_scrapper_name": "All",
+            "src_base_url": None,
+        })
+        for src in self.getAll("source", {"src_name": "ASC"}):
+            ret.append(src)
+        return ret
 
     @classmethod
     def getSourceId(self, src_name):
@@ -334,15 +343,23 @@ class YanaDB(BaseDB):
 
     @classmethod
     def getNovelList(self, src_id):
-        query = """
-        SELECT novel.nv_id, nv_title FROM novel
-        LEFT JOIN novel_source ON novel.nv_id = novel_source.nv_id
-        WHERE novel_source.src_id = :src_id
-        ORDER BY nv_title ASC
-        """
+        if src_id == "0":
+            query = """
+            SELECT novel.nv_id, nv_title FROM novel
+            LEFT JOIN novel_source ON novel.nv_id = novel_source.nv_id
+            ORDER BY nv_title ASC
+            """
+        else:
+            query = """
+            SELECT novel.nv_id, nv_title FROM novel
+            LEFT JOIN novel_source ON novel.nv_id = novel_source.nv_id
+            WHERE novel_source.src_id = :src_id
+            ORDER BY nv_title ASC
+            """
         do = QSqlQuery()
         do.prepare(query)
-        do.bindValue(':src_id', src_id)
+        if src_id != "0":
+            do.bindValue(':src_id', src_id)
         do.exec()
 
         return self.parseResults(do)
