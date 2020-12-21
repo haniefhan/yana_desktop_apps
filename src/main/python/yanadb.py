@@ -155,7 +155,7 @@ class BaseDB():
 
 class YanaDB(BaseDB):
     _migration_path = getcwd() + "/src/main/python/migrations/"
-    _source_path = getcwd() + "/src/main/python/source/"
+    _sources_path = getcwd() + "/src/main/python/sources/"
 
     def __init__(self):
         super().__init__('yana.db')
@@ -183,13 +183,13 @@ class YanaDB(BaseDB):
 
     def insertSource(self):
         files = [
-            f for f in listdir(self._source_path) if isfile(join(self._source_path, f))
+            f for f in listdir(self._sources_path) if isfile(join(self._sources_path, f))
         ]
 
         do = QSqlQuery()
 
         for file in files:
-            fd = open(self._source_path + file, "r")
+            fd = open(self._sources_path + file, "r")
             js_string = fd.read()
             fd.close()
             source = json.loads(js_string)
