@@ -229,4 +229,7 @@ class Shintranslations():
                     del(img[attr])
             img['width'] = "100%"
 
+        for a in content.findAll("a"):
+            del(a["href"])
+
         return self.buildHTML(str(content))
