@@ -24,6 +24,7 @@ from scrapper.moonruneworks import Moonruneworks
 from scrapper.erolns import Erolns
 from scrapper.shintranslations import Shintranslations
 
+YanaDB = YanaDB()
 
 def NovelSwitcher(src_name):
     if src_name == "Stabbing With Syringe":
@@ -64,12 +65,12 @@ class YanaRead(QMainWindow):
         self.textArea.setContentsMargins(1, 1, 1, 1)
 
     def read(self, src_id, chp_id):
-        src = self.yana.yanadb.getSource(src_id)
+        src = YanaDB.getSource(src_id)
 
         self.novel = NovelSwitcher(src['src_name'])
 
         if self.novel is not None:
-            chp = self.yana.yanadb.getChapter(chp_id)
+            chp = YanaDB.getChapter(chp_id)
             nv_id = chp['nv_id']
 
             self.setChapterList(nv_id, chp_id)
@@ -86,7 +87,7 @@ class YanaRead(QMainWindow):
     def setChapterList(self, nv_id, chp_id=None):
         self.chapterList.clear()
         groupName = ""
-        for chp in self.yana.yanadb.getChapterList(nv_id):
+        for chp in YanaDB.getChapterList(nv_id):
             if chp['volume_name'] != groupName:
                 # self.chapterList.addItem(chp['volume_name'])
                 item = QListWidgetItem(chp['volume_name'])
@@ -112,7 +113,7 @@ class YanaRead(QMainWindow):
         if self.chapterList.currentItem().data(33) == "chapter":
             chp_id = self.chapterList.currentItem().data(34)
 
-            url = self.yana.yanadb.getUrlChapter(chp_id)
+            url = YanaDB.getUrlChapter(chp_id)
             content = self.novel.getContent(url)
 
             self.textArea.setHtml(content)
@@ -178,8 +179,8 @@ class Yana(QMainWindow):
     def __init__(self):
         super(Yana, self).__init__()
         self.resize(870, 600)
-        self.yanadb = YanaDB()
-        self.yanadb.startUpInitialization()
+        # self.yanadb = YanaDB()
+        YanaDB.startUpInitialization()
         self.initUI()
 
     # START: USER INTERFACE
@@ -419,7 +420,7 @@ class Yana(QMainWindow):
         self.progress.setValue(progress)
 
     def updateNovel(self, nv):
-        self.yanadb.updateNovelList(nv, self.src_id)
+        YanaDB.updateNovelList(nv, self.src_id)
 
     def updateComplete(self, jml):
         self.updateNovelList()
@@ -434,7 +435,7 @@ class Yana(QMainWindow):
 
     def scrappingNovelList(self):
         # set src_id
-        self.src_id = self.yanadb.getSourceId(self.sourceList.currentText())
+        self.src_id = YanaDB.getSourceId(self.sourceList.currentText())
         src_text = self.sourceList.currentText()
 
         # do it in another thread
@@ -455,7 +456,7 @@ class Yana(QMainWindow):
         # clear all data
         self.novelList.clear()
 
-        for nv in self.yanadb.getNovelList(item.data()):
+        for nv in YanaDB.getNovelList(item.data()):
             item = QListWidgetItem(nv['nv_title'])
             item.setData(33, nv['nv_id'])
             item.setData(3, nv['nv_title'])  # 3 is Qt.TooltipRole
