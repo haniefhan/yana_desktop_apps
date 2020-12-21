@@ -19,24 +19,37 @@ import math
 
 sys.path.append(".")
 from yanadb import YanaDB
-from scrapper.stabbingwithasyringe import Stabbingwithasyringe
-from scrapper.moonruneworks import Moonruneworks
-from scrapper.erolns import Erolns
-from scrapper.shintranslations import Shintranslations
 
 YanaDB = YanaDB()
 
+# import all source from DB and folder "scrapper"
+mods = []
+sources = YanaDB.getAll("source", {"src_name": "ASC"})
+for src in sources:
+    exec(
+        "from scrapper."
+        + src['src_scrapper_name'].lower()
+        + " import "
+        + src['src_scrapper_name'])
+    # ex :
+    # from shintranslations import Shintranslations
+
+
 def NovelSwitcher(src_name):
-    if src_name == "Stabbing With Syringe":
-        return Stabbingwithasyringe()
-    elif src_name == "Moonruneworks":
-        return Moonruneworks()
-    elif src_name == "Ero Light Novel Translations":
-        return Erolns()
-    elif src_name == "Shin Translations":
-        return Shintranslations()
-    else:
-        return None
+    item = next(item for item in sources if item["src_name"] == src_name)
+    return eval(item['src_scrapper_name'])
+
+    # top same as below
+    # if src_name == "Stabbing With Syringe":
+    #     return Stabbingwithasyringe()
+    # elif src_name == "Moonruneworks":
+    #     return Moonruneworks()
+    # elif src_name == "Ero Light Novel Translations":
+    #     return Erolns()
+    # elif src_name == "Shin Translations":
+    #     return Shintranslations()
+    # else:
+    #     return None
 
 
 class YanaRead(QMainWindow):
