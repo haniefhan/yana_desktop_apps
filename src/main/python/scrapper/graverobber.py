@@ -171,19 +171,31 @@ class Graverobber(Novelbase):
         page = self._get_web_page(url)
         soup = BeautifulSoup(page.content, "html.parser")
 
-        decompose_list = [
-            "script",
-            "div#content div#primary main#main article div.post-entry div.wp-block-columns",
-        ]
-
-        for decompose in decompose_list:
-            item = soup.select_one(decompose)
-            if item is not None:
-                item.decompose()
-
         content = soup.select_one(
             "div#content div#primary main#main article div.post-entry"
         )
+
+        # hiding the post
+        ass = content.findAll("a")
+        for a in ass:
+            if "click here for" in a.getText().lower():
+                url = a.get('href')
+                page = self._get_web_page(url)
+                soup = BeautifulSoup(page.content, "html.parser")
+
+                content = soup.select_one(
+                    "div#content div#primary main#main article div.post-entry"
+                )
+
+        decompose_list = [
+            "script",
+            "div.wp-block-columns",
+        ]
+
+        for decompose in decompose_list:
+            item = content.select_one(decompose)
+            if item is not None:
+                item.decompose()
 
         img_attr = [
             "data-lazy-sizes", "data-lazy-src", "data-lazy-srcset", "class",
