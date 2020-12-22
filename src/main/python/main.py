@@ -504,7 +504,11 @@ class Yana(QMainWindow):
         self.novelLastUpdate.adjustSize()
 
         if info['nv_image_url_original'] != '':
-            data = requests.get(info['nv_image_url_original'])
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+            }
+
+            data = requests.get(info['nv_image_url_original'], headers=headers)
 
             image = QImage()
             image.loadFromData(data.content)
