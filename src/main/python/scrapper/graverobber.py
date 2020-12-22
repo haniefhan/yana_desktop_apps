@@ -127,6 +127,8 @@ class Graverobber(Novelbase):
                             if "Illustration" in title:
                                 if len(c) > 0:
                                     c = str(int(c) + 1)
+                                else:
+                                    c = "0"
                             else:
                                 c = "".join([i for i in title if i.isdigit()])
 
