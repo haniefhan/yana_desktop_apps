@@ -79,12 +79,28 @@ class YanaRead(QMainWindow):
         self.chapterList.resize(200, self.height() - 40)
         self.chapterList.itemDoubleClicked.connect(self.setContent)
 
-        self.textArea = QWebEngineView(self)
-        self.textArea.move(220, 30)
-        self.textArea.resize(self.width() - 225, self.height() - 40)
-        self.textArea.setAttribute(Qt.WA_StyledBackground)
-        self.textArea.setStyleSheet("border: 1px solid #999;")
-        self.textArea.setContentsMargins(1, 1, 1, 1)
+        self.readArea = QWebEngineView(self)
+        self.readArea.move(220, 30)
+        self.readArea.resize(self.width() - 225, self.height() - 70)
+        self.readArea.setAttribute(Qt.WA_StyledBackground)
+        self.readArea.setStyleSheet("border: 1px solid #999;")
+        self.readArea.setContentsMargins(1, 1, 1, 1)
+
+        self.chapterLabel = QLabel(self)
+        self.chapterLabel.move(220, self.height() - 35)
+        self.chapterLabel.resize(220, 25)
+
+        self.prevButton = QPushButton(self)
+        self.prevButton.setText("< Prev Chapter")
+        self.prevButton.move(450, self.height() - 35)
+        self.prevButton.resize(100, 25)
+        self.prevButton.clicked.connect(self.prevChapter)
+
+        self.nextButton = QPushButton(self)
+        self.nextButton.setText("Next Chapter >")
+        self.nextButton.move(557, self.height() - 35)
+        self.nextButton.resize(100, 25)
+        self.nextButton.clicked.connect(self.nextChapter)
 
     def read(self, src_id, chp_id):
         src = YanaDB.getSource(src_id)
@@ -135,10 +151,36 @@ class YanaRead(QMainWindow):
         if self.chapterList.currentItem().data(33) == "chapter":
             chp_id = self.chapterList.currentItem().data(34)
 
-            url = YanaDB.getUrlChapter(chp_id)
+            # url = YanaDB.getUrlChapter(chp_id)
+            chp = YanaDB.getChapter(chp_id)
+            url = chp["chp_url"]
             content = self.novel.getContent(url)
 
-            self.textArea.setHtml(content)
+            self.chapterLabel.setText(chp["chp_title"])
+            self.readArea.setHtml(content)
+
+    def prevChapter(self):
+        current = self.chapterList.currentRow()
+        pr = current - 1
+        if pr > 0:
+            self.chapterList.setCurrentRow(pr)
+            self.setContent()
+        else:
+            QMessageBox.information(
+                None, 'Previous Chapter',
+                'This is first chapter!')
+
+    def nextChapter(self):
+        current = self.chapterList.currentRow()
+        nx = current + 1
+        if nx < self.chapterList.count():
+            self.chapterList.setCurrentRow(nx)
+            self.setContent()
+        else:
+            QMessageBox.information(
+                None, 'Next Chapter',
+                'This is last chapter!')
+
 
 
 class UpdateThread(QThread):
