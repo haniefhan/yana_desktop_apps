@@ -33,6 +33,8 @@ for src in sources:
             + " import "
             + src['src_scrapper_name'])
     except ModuleNotFoundError:
+        print("scrapper module not found!")
+        print(src)
         pass
     # ex :
     # from shintranslations import Shintranslations
