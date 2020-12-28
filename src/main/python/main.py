@@ -64,6 +64,8 @@ def NovelSwitcher(src_name):
 
 
 class YanaRead(QMainWindow):
+    _currentChapter = 0
+
     def __init__(self, yana=None):
         super(YanaRead, self).__init__(yana)
         self.resize(870, 600)
@@ -149,7 +151,9 @@ class YanaRead(QMainWindow):
             if chp['chp_id'] == chp_id:
                 self.chapterList.setCurrentItem(item)
 
-    def setContent(self):
+    def setContent(self, state=None):
+        self._currentChapter = self.chapterList.currentRow()
+
         if self.chapterList.currentItem().data(33) == "chapter":
             chp_id = self.chapterList.currentItem().data(34)
 
@@ -160,24 +164,30 @@ class YanaRead(QMainWindow):
 
             self.chapterLabel.setText(chp["chp_title"])
             self.readArea.setHtml(content)
+        if (state is not None
+        and self.chapterList.currentItem().data(33) == "chapter_header"):
+            if state == 'Up':
+                self.nextChapter()
+            elif state == 'Down':
+                self.prevChapter()
 
     def prevChapter(self):
-        current = self.chapterList.currentRow()
+        current = self._currentChapter
         pr = current - 1
         if pr > 0:
             self.chapterList.setCurrentRow(pr)
-            self.setContent()
+            self.setContent("Down")
         else:
             QMessageBox.information(
                 None, 'Previous Chapter',
                 'This is first chapter!')
 
     def nextChapter(self):
-        current = self.chapterList.currentRow()
+        current = self._currentChapter
         nx = current + 1
         if nx < self.chapterList.count():
             self.chapterList.setCurrentRow(nx)
-            self.setContent()
+            self.setContent("Up")
         else:
             QMessageBox.information(
                 None, 'Next Chapter',
