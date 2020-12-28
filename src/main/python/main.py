@@ -340,7 +340,7 @@ class Yana(QMainWindow):
         self.titleLabel.setStyleSheet("font-weight: bold")
         self.titleLabel.adjustSize()
 
-        y = y + y_height
+        y = y + (y_height * 2) - 10
 
         self.titleAnotherLabel = QLabel(self)
         self.titleAnotherLabel.setText("Title (Another)")
@@ -372,7 +372,7 @@ class Yana(QMainWindow):
         self.descLabel.setStyleSheet("font-weight: bold")
         self.descLabel.adjustSize()
 
-        y = y + 70
+        y = y + 60
 
         self.lastUpdateLabel = QLabel(self)
         self.lastUpdateLabel.setText("Last Update")
@@ -389,7 +389,7 @@ class Yana(QMainWindow):
         self.dot.setStyleSheet("font-weight: bold")
         self.dot.adjustSize()
 
-        y = y + y_height
+        y = y + (y_height * 2) - 10
 
         self.dot = QLabel(self)
         self.dot.setText(":")
@@ -421,7 +421,7 @@ class Yana(QMainWindow):
         self.dot.setStyleSheet("font-weight: bold")
         self.dot.adjustSize()
 
-        y = y + 70
+        y = y + 60
 
         self.dot = QLabel(self)
         self.dot.setText(":")
@@ -434,8 +434,10 @@ class Yana(QMainWindow):
 
         self.novelTitle = QLabel(self)
         self.novelTitle.move(x, y)
+        self.novelTitle.resize(385, 30)
+        self.novelTitle.setAlignment(Qt.AlignLeft)
 
-        y = y + y_height
+        y = y + (y_height * 2) - 10
 
         self.novelAnotherTitle = QLabel(self)
         self.novelAnotherTitle.move(x, y)
@@ -450,7 +452,7 @@ class Yana(QMainWindow):
         self.novelArtist = QLabel(self)
         self.novelArtist.move(x, y)
 
-        y = y + y_height + 70
+        y = y + y_height + 60
 
         self.novelLastUpdate = QLabel(self)
         self.novelLastUpdate.move(x, y)
@@ -543,7 +545,8 @@ class Yana(QMainWindow):
         info = YanaDB.getNovelInfo(nv_id)
 
         self.novelTitle.setText(info['nv_title'])
-        self.novelTitle.adjustSize()
+        self.novelTitle.setWordWrap(True)
+        # self.novelTitle.adjustSize()
 
         self.novelAnotherTitle.setText(info['nv_title_original'])
         self.novelAnotherTitle.adjustSize()
