@@ -93,23 +93,6 @@ class Wuxiaworld(Novelbase):
                 href = a.get("href")
 
                 c = self.parseChapterNo(title, last_chp)
-                # if "–" in title:
-                #     n = title.split("–")[0]
-                #     c = "".join([i for i in n if i.isdigit()])
-                # elif "-" in title:
-                #     n = title.split("-")[0]
-                #     c = "".join([i for i in n if i.isdigit()])
-                # elif ":" in title:
-                #     n = title.split(":")[0]
-                #     c = "".join([i for i in n if i.isdigit()])
-                # else:
-                #     c = "".join([i for i in title if i.isdigit()])
-
-                # if c == "":
-                #     print("Chapter")
-                #     print(url)
-                #     print(title)
-                #     print(href)
 
                 no = "v" + str(v) + "c" + str(c)
                 chp = {
@@ -165,8 +148,8 @@ class Wuxiaworld(Novelbase):
         ]
 
         for decompose in decompose_list:
-            item = content.select_one(decompose)
-            if item is not None:
-                item.decompose()
+            for item in content.select(decompose):
+                if item is not None:
+                    item.decompose()
 
         return self.buildHTML(str(content))
