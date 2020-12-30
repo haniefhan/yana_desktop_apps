@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (
 # from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 from PyQt5.QtGui import (
     QPixmap, QImage, QStandardItemModel, QStandardItem, QTextCursor,
-    QTextDocument
+    QTextDocument, QFontMetrics
 )
 
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
@@ -162,7 +162,11 @@ class YanaRead(QMainWindow):
             url = chp["chp_url"]
             content = self.novel.getContent(url)
 
-            self.chapterLabel.setText(chp["chp_title"])
+            # self.chapterLabel.setText(chp["chp_title"])
+            metrics = QFontMetrics(self.chapterLabel.font())
+            elidedText = metrics.elidedText(chp["chp_title"], Qt.ElideRight, self.chapterLabel.width());
+            self.chapterLabel.setText(elidedText)
+
             self.readArea.setHtml(content)
         if (state is not None
         and self.chapterList.currentItem().data(33) == "chapter_header"):
