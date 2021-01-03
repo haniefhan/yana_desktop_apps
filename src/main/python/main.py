@@ -546,6 +546,8 @@ class Yana(QMainWindow):
             item.setData(3, nv['nv_title'])  # 3 is Qt.TooltipRole
             self.novelList.addItem(item)
 
+        self.filterNovelList()
+
     _book_cover_path = "assets/cover/"
 
     def showNovelInfo(self):
