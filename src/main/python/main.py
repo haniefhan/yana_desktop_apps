@@ -16,6 +16,8 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 import sys
 import requests
 import math
+import os
+import re
 
 sys.path.append(".")
 from yanadb import YanaDB
@@ -544,6 +546,8 @@ class Yana(QMainWindow):
             item.setData(3, nv['nv_title'])  # 3 is Qt.TooltipRole
             self.novelList.addItem(item)
 
+    _book_cover_path = "assets/cover/"
+
     def showNovelInfo(self):
         nv_id = self.novelList.currentItem().data(33)
         info = YanaDB.getNovelInfo(nv_id)
@@ -565,16 +569,47 @@ class Yana(QMainWindow):
         self.novelLastUpdate.adjustSize()
 
         if info['nv_image_url_original'] != '':
-            headers = {
-                "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
-            }
+            if (
+                info['nv_image_url'] == ''
+                or not os.path.isfile(info['nv_image_url'])
+            ):
+                img_name_original = os.path.basename(info['nv_image_url_original'])
+                img_name_parse = img_name_original.split("?")[0]
+                filetype = img_name_parse.split(".")[-1]
 
-            data = requests.get(info['nv_image_url_original'], headers=headers)
+                img_local_name = str(info['nv_id']) + "_"
+                img_local_name += re.sub(
+                    r'[^A-Za-z0-9 ]', r'', info['nv_title']
+                ).replace(' ', '-').lower()
+                img_local_name += "." + filetype
 
-            image = QImage()
-            image.loadFromData(data.content)
+                headers = {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+                }
 
-            book_cover = QPixmap(image).scaled(
+                data = requests.get(info['nv_image_url_original'], headers=headers)
+
+                img_local_path = self._book_cover_path + img_local_name
+
+                # localize the cover
+                file = open(img_local_path, "wb")
+                file.write(data.content)
+                file.close()
+
+                YanaDB.update(
+                    "novel",
+                    {"nv_id": info['nv_id']},
+                    {"nv_image_url": img_local_path}
+                )
+            else:
+                img_local_path = info['nv_image_url']
+
+            # image = QImage()
+            # image.loadFromData(data.content)
+
+            # book_cover = QPixmap(image).scaled(
+            #     self.cover_width, self.cover_height)
+            book_cover = QPixmap(img_local_path).scaled(
                 self.cover_width, self.cover_height)
             self.bookCover.setPixmap(book_cover)
         else:
