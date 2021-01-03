@@ -152,6 +152,37 @@ class BaseDB():
 
         return do.lastInsertId()
 
+    @classmethod
+    def update(self, table, params, update):
+        do = QSqlQuery()
+        where = ""
+        st = ""
+        if len(params) > 0:
+            for i, key in enumerate(params, start=0):
+                if i == 0:
+                    where += " WHERE "
+                else:
+                    where += " AND "
+                where += "{} = :{}".format(key, key)
+
+        for i, key in enumerate(update, start=0):
+            if i > 0:
+                st += ", "
+            st += key + " = " + f":{key}"
+
+        query = "UPDATE {}".format(table)
+        query += " SET " + st
+        query += where + ";"
+
+        do.prepare(query)
+
+        for key in params:
+            do.bindValue(f':{key}', params[key])
+        for key in update:
+            do.bindValue(f':{key}', update[key])
+
+        return do.exec()
+
 
 class YanaDB(BaseDB):
     _migration_path = getcwd() + "/src/main/python/migrations/"
