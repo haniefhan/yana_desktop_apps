@@ -12,5 +12,7 @@ CREATE TABLE IF NOT EXISTS novel(
     nv_total_chapter varchar(255) NULL,
     nv_last_chapter varchar(255) NULL,
     nv_last_update datetime NULL,
-    nv_last_check datetime NULL
+    nv_last_check datetime NULL,
+    nv_read integer NULL DEFAULT 0,
+    nv_new_chapter integer NULL DEFAULT 0
 );
