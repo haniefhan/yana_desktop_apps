@@ -3,7 +3,8 @@ import requests
 
 class Novelbase():
     _base_url = ""
-    _user_agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+    _user_agent = "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36\
+     (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
 
     @classmethod
     def _get_web_page(self, url, reqtype="get", options=dict()):
@@ -36,3 +37,26 @@ class Novelbase():
             return requests.post(url, headers=headers, data=body)
         else:
             return requests.get(url, headers=headers)
+
+    styleSheet = """
+    <style>
+        body{
+            font-family: Arial;
+            font-size: 11pt;
+            padding: 20px;
+            line-height: 25px;
+        }
+    </style>"""
+
+    @classmethod
+    def buildHTML(self, body):
+        return """
+        <html>
+            <head>
+            """ + self.styleSheet + """
+            </head>
+            <body>
+            """ + body + """
+            </body>
+        </html>
+        """
