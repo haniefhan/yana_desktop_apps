@@ -1,10 +1,13 @@
-import requests
 import re
+import sys
 
 from bs4 import BeautifulSoup
 
+sys.path.append(".")
+from scrapper.novelbase import Novelbase
 
-class Moonruneworks():
+
+class Moonruneworks(Novelbase):
 
     _base_url = "https://moonruneworks.com/"
 
@@ -16,7 +19,7 @@ class Moonruneworks():
         ret = []
         url = self._base_url
 
-        page = requests.get(url)
+        page = self._get_web_page(url)
         soup = BeautifulSoup(page.content, "html.parser")
 
         novel_list = soup.select(
@@ -44,7 +47,7 @@ class Moonruneworks():
     @classmethod
     def getChapters(self, url, soup=None):
         if soup is None:
-            page = requests.get(url)
+            page = self._get_web_page(url)
             soup = BeautifulSoup(page.content, "html.parser")
 
         chapters = []
@@ -78,32 +81,9 @@ class Moonruneworks():
                         chapters.append(chp)
         return chapters
 
-    addStyleSheet = """
-    <style>
-        body{
-            font-family: Arial;
-            font-size: 11pt;
-            padding: 20px;
-            line-height: 25px;
-        }
-    </style>"""
-
-    @classmethod
-    def buildHTML(self, body):
-        return """
-        <html>
-            <head>
-            """ + self.addStyleSheet + """
-            </head>
-            <body>
-            """ + body + """
-            </body>
-        </html>
-        """
-
     @classmethod
     def getContent(self, url):
-        page = requests.get(url)
+        page = self._get_web_page(url)
         soup = BeautifulSoup(page.content, "html.parser")
 
         decompose_list = [

@@ -1,10 +1,13 @@
-import requests
 import re
+import sys
 
 from bs4 import BeautifulSoup
 
+sys.path.append(".")
+from scrapper.novelbase import Novelbase
 
-class Erolns():
+
+class Erolns(Novelbase):
 
     _base_url = "http://erolns.blogspot.com/"
     _base_url_https = "https://erolns.blogspot.com/"
@@ -17,7 +20,7 @@ class Erolns():
         ret = []
         url = self._base_url + "2015/11/projects.html"
 
-        page = requests.get(url)
+        page = self._get_web_page(url)
         soup = BeautifulSoup(page.content, "html.parser")
 
         novel_list = soup.select(
@@ -43,7 +46,7 @@ class Erolns():
 
     @classmethod
     def getDetail(self, url):
-        page = requests.get(url)
+        page = self._get_web_page(url)
         soup = BeautifulSoup(page.content, "html.parser")
 
         image = soup.select_one(
@@ -71,7 +74,7 @@ class Erolns():
     @classmethod
     def getChapters(self, url, soup=None):
         if soup is None:
-            page = requests.get(url)
+            page = self._get_web_page(url)
             soup = BeautifulSoup(page.content, "html.parser")
 
         chapters = []
@@ -91,28 +94,15 @@ class Erolns():
                     no += 1
         return chapters
 
-    addStyleSheet = """
+    styleSheet = """
     <style>
         body{font-family: Arial; font-size: 11pt; padding: 20px;}
         div{line-height: 25px;}
     </style>"""
 
     @classmethod
-    def buildHTML(self, body):
-        return """
-        <html>
-            <head>
-            """ + self.addStyleSheet + """
-            </head>
-            <body>
-            """ + body + """
-            </body>
-        </html>
-        """
-
-    @classmethod
     def getContent(self, url):
-        page = requests.get(url)
+        page = self._get_web_page(url)
         soup = BeautifulSoup(page.content, "html.parser")
 
         decompose_list = [

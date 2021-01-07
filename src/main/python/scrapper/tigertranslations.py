@@ -1,10 +1,13 @@
-import requests
 import re
+import sys
 
 from bs4 import BeautifulSoup
 
+sys.path.append(".")
+from scrapper.novelbase import Novelbase
 
-class Tigertranslations():
+
+class Tigertranslations(Novelbase):
 
     _base_url = "https://tigertranslations.org/"
 
@@ -16,7 +19,7 @@ class Tigertranslations():
         ret = []
         url = self._base_url
 
-        page = requests.get(url)
+        page = self._get_web_page(url)
         soup = BeautifulSoup(page.content, "html.parser")
 
         novel_list = soup.select(
@@ -42,7 +45,7 @@ class Tigertranslations():
 
     @classmethod
     def getDetail(self, url):
-        page = requests.get(url)
+        page = self._get_web_page(url)
         soup = BeautifulSoup(page.content, "html.parser")
 
         title = soup.select_one(
@@ -77,7 +80,7 @@ class Tigertranslations():
     @classmethod
     def getChapters(self, url, soup=None):
         if soup is None:
-            page = requests.get(url)
+            page = self._get_web_page(url)
             soup = BeautifulSoup(page.content, "html.parser")
 
         chapters = []
@@ -101,25 +104,6 @@ class Tigertranslations():
                     chapters.append(chp)
         return chapters
 
-    addStyleSheet = """
-    <style>
-        body{font-family: Arial; font-size: 11pt; padding: 20px;}
-        div{line-height: 25px;}
-    </style>"""
-
-    @classmethod
-    def buildHTML(self, body):
-        return """
-        <html>
-            <head>
-            """ + self.addStyleSheet + """
-            </head>
-            <body>
-            """ + body + """
-            </body>
-        </html>
-        """
-
     @classmethod
     def getContent(self, url):
         content_page_1 = ""
@@ -130,7 +114,7 @@ class Tigertranslations():
             "srcset", "loading", "height", "sizes"
         ]
 
-        page = requests.get(url)
+        page = self._get_web_page(url)
         soup = BeautifulSoup(page.content, "html.parser")
 
         decompose_list = [
@@ -167,7 +151,7 @@ class Tigertranslations():
         content_page_1 = content
 
         if page_2 != "":
-            page = requests.get(page_2)
+            page = self._get_web_page(page_2)
             soup = BeautifulSoup(page.content, "html.parser")
 
             for decompose in decompose_list:

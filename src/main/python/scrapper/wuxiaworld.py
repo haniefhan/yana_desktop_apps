@@ -84,7 +84,7 @@ class Wuxiaworld(Novelbase):
             volume = panel.select_one(
                 "div.panel-heading h4.panel-title span.title"
             ).getText().strip()
-            
+
             if volume == "Table of Contents" or volume == "Chapters":
                 volume = "Volume 1"
 
@@ -106,29 +106,6 @@ class Wuxiaworld(Novelbase):
             v += 1
 
         return chapters
-
-    addStyleSheet = """
-    <style>
-        body{
-            font-family: Arial;
-            font-size: 11pt;
-            padding: 20px;
-            line-height: 25px;
-        }
-    </style>"""
-
-    @classmethod
-    def buildHTML(self, body):
-        return """
-        <html>
-            <head>
-            """ + self.addStyleSheet + """
-            </head>
-            <body>
-            """ + body + """
-            </body>
-        </html>
-        """
 
     @classmethod
     def getContent(self, url):
