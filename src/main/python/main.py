@@ -521,6 +521,7 @@ class Yana(QMainWindow):
         # set src_id
         self.src_id = YanaDB.getSourceId(self.sourceList.currentText())
         src_text = self.sourceList.currentText()
+        self.changeProgressLabel("Update Started!")
 
         # do it in another thread
         self.worker = UpdateThread(src_text)
