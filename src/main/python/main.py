@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (
 # from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 from PyQt5.QtGui import (
     QPixmap, QImage, QStandardItemModel, QStandardItem, QTextCursor,
-    QTextDocument, QFontMetrics
+    QTextDocument, QFontMetrics, QKeyEvent
 )
 
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
@@ -199,6 +199,16 @@ class YanaRead(QMainWindow):
                 None, 'Next Chapter',
                 'This is last chapter!')
 
+    def keyPressEvent(self, event: QKeyEvent):
+        # print(event.key())
+        if event.key() == 87:  # W
+            print("W")
+        elif event.key() == 68 or event.key() == Qt.Key_Right:  # D
+            self.nextChapter()
+        elif event.key() == 83:  # S
+            print("S")
+        elif event.key() == 65 or event.key() == Qt.Key_Left:  # A
+            self.prevChapter()
 
 
 class UpdateThread(QThread):
