@@ -14,5 +14,5 @@ CREATE TABLE IF NOT EXISTS novel(
     nv_last_update datetime NULL,
     nv_last_check datetime NULL,
     nv_read integer NULL DEFAULT 0,
-    nv_new_chapter integer NULL DEFAULT 0
+    nv_new_chapter integer NULL DEFAULT 1
 );
