@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (
 # from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 from PyQt5.QtGui import (
     QPixmap, QImage, QStandardItemModel, QStandardItem, QTextCursor,
-    QTextDocument, QFontMetrics, QKeyEvent
+    QTextDocument, QFontMetrics, QKeyEvent, QColor
 )
 
 from PyQt5.QtCore import QThread, pyqtSignal, Qt
@@ -40,6 +40,11 @@ for src in sources:
         pass
     # ex :
     # from shintranslations import Shintranslations
+
+# init variable
+_unread_color = "#7fc97f"
+_read_color = "#ffffff"
+_new_color = "#94c5fd"
 
 
 def NovelSwitcher(src_name):
@@ -148,6 +153,12 @@ class YanaRead(QMainWindow):
             item.setData(33, 'chapter')
             item.setData(34, chp['chp_id'])
             item.setData(35, chp['src_id'])
+
+            if chp['chp_read'] == 0:
+                item.setBackground(QColor(_new_color))
+            else:
+                item.setBackground(QColor(_read_color))
+
             self.chapterList.addItem(item)
 
             if chp['chp_id'] == chp_id:
@@ -166,12 +177,23 @@ class YanaRead(QMainWindow):
 
             # self.chapterLabel.setText(chp["chp_title"])
             metrics = QFontMetrics(self.chapterLabel.font())
-            elidedText = metrics.elidedText(chp["chp_title"], Qt.ElideRight, self.chapterLabel.width());
+            elidedText = metrics.elidedText(chp["chp_title"], Qt.ElideRight, self.chapterLabel.width())
             self.chapterLabel.setText(elidedText)
 
             self.readArea.setHtml(content)
-        if (state is not None
-        and self.chapterList.currentItem().data(33) == "chapter_header"):
+
+            YanaDB.update(
+                "chapter",
+                {"chp_id": chp_id},
+                {"chp_read": 1}
+            )
+
+            nv_id = chp['nv_id']
+            self.setChapterList(nv_id, chp_id)
+        if (
+            state is not None
+            and self.chapterList.currentItem().data(33) == "chapter_header"
+        ):
             if state == 'Up':
                 self.nextChapter()
             elif state == 'Down':
@@ -555,11 +577,47 @@ class Yana(QMainWindow):
             item = QListWidgetItem(nv['nv_title'])
             item.setData(33, nv['nv_id'])
             item.setData(3, nv['nv_title'])  # 3 is Qt.TooltipRole
+
+            if nv['nv_read'] == 0:
+                item.setBackground(QColor(_new_color))
+            else:
+                item.setBackground(QColor(_read_color))
+
             self.novelList.addItem(item)
 
         self.filterNovelList()
 
     _book_cover_path = "assets/cover/"
+
+    def updateChapterList(self, info={}):
+        if 'nv_id' not in info:
+            nv_id = self.novelList.currentItem().data(33)
+            info = YanaDB.getNovelInfo(nv_id)
+
+        groupName = ""
+        self.chapterList.clear()
+        for chp in YanaDB.getChapterList(info['nv_id']):
+            if chp['volume_name'] != groupName:
+                # self.chapterList.addItem(chp['volume_name'])
+                item = QListWidgetItem(chp['volume_name'])
+                item.setData(33, 'chapter_header')
+                font = item.font()
+                font.setBold(True)
+                item.setFont(font)
+                self.chapterList.addItem(item)
+                groupName = chp['volume_name']
+            # self.chapterList.addItem(" - " + chp['chp_title'])
+            item = QListWidgetItem(" - " + chp['chp_title'])
+            item.setData(33, 'chapter')
+            item.setData(34, chp['chp_id'])
+            item.setData(35, chp['src_id'])
+
+            if chp['chp_read'] == 0:
+                item.setBackground(QColor(_new_color))
+            else:
+                item.setBackground(QColor(_read_color))
+
+            self.chapterList.addItem(item)
 
     def showNovelInfo(self):
         nv_id = self.novelList.currentItem().data(33)
@@ -630,30 +688,27 @@ class Yana(QMainWindow):
                 self.cover_width, self.cover_height)
             self.bookCover.setPixmap(book_cover)
 
-        groupName = ""
-        self.chapterList.clear()
-        for chp in YanaDB.getChapterList(info['nv_id']):
-            if chp['volume_name'] != groupName:
-                # self.chapterList.addItem(chp['volume_name'])
-                item = QListWidgetItem(chp['volume_name'])
-                item.setData(33, 'chapter_header')
-                font = item.font()
-                font.setBold(True)
-                item.setFont(font)
-                self.chapterList.addItem(item)
-                groupName = chp['volume_name']
-            # self.chapterList.addItem(" - " + chp['chp_title'])
-            item = QListWidgetItem(" - " + chp['chp_title'])
-            item.setData(33, 'chapter')
-            item.setData(34, chp['chp_id'])
-            item.setData(35, chp['src_id'])
-            self.chapterList.addItem(item)
+        YanaDB.update(
+            "novel",
+            {"nv_id": info['nv_id']},
+            {"nv_read": 1}
+        )
+
+        self.updateChapterList(info)
 
     def readChapter(self):
         # check if header
         if self.chapterList.currentItem().data(33) == "chapter":
             chp_id = self.chapterList.currentItem().data(34)
             src_id = self.chapterList.currentItem().data(35)
+
+            YanaDB.update(
+                "chapter",
+                {"chp_id": chp_id},
+                {"chp_read": 1}
+            )
+
+            self.updateChapterList()
 
             yanaread = YanaRead(self)
             yanaread.show()
