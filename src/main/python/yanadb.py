@@ -282,13 +282,13 @@ class YanaDB(BaseDB):
     def getNovelList(self, src_id):
         if src_id == "0":
             query = """
-            SELECT novel.nv_id, nv_title FROM novel
+            SELECT novel.nv_id, nv_title, nv_read, nv_new_chapter FROM novel
             LEFT JOIN novel_source ON novel.nv_id = novel_source.nv_id
             ORDER BY nv_title ASC
             """
         else:
             query = """
-            SELECT novel.nv_id, nv_title FROM novel
+            SELECT novel.nv_id, nv_title, nv_read, nv_new_chapter FROM novel
             LEFT JOIN novel_source ON novel.nv_id = novel_source.nv_id
             WHERE novel_source.src_id = :src_id
             ORDER BY nv_title ASC
