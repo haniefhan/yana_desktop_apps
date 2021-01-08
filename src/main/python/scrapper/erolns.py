@@ -118,4 +118,19 @@ class Erolns(Novelbase):
             "div.content div.main.section div.blog-posts div.post"
         )
 
+        img_attr = [
+            "border", "height", "width"
+        ]
+
+        for img in content.findAll("img"):
+            for attr in img_attr:
+                if img.get(attr) is not None:
+                    del(img[attr])
+            img['width'] = "100%"
+
+        for a in content.findAll("a"):
+            del(a["href"])
+            if a.get("style") is not None:
+                del(a["style"])
+
         return self.buildHTML(str(content))
